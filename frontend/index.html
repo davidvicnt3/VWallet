@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VWallet · Gestor de gastos</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/main.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <span class="logo-icon">◈</span>
+      <span class="logo-text">VWallet</span>
+    </div>
+    <button class="sidebar-toggle" id="sidebarToggle" title="Colapsar menú">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="#" class="nav-item active" data-section="dashboard">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="3" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/>
+          <rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+      </span>
+      <span class="nav-label">Dashboard</span>
+    </a>
+    <a href="#" class="nav-item" data-section="movimientos">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 5v14M5 12l7 7 7-7"/>
+        </svg>
+      </span>
+      <span class="nav-label">Movimientos</span>
+    </a>
+    <a href="#" class="nav-item" data-section="historial">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 8v4l3 3M3.05 11a9 9 0 1 0 .5-3"/>
+          <path d="M3 5v3h3"/>
+        </svg>
+      </span>
+      <span class="nav-label">Historial</span>
+    </a>
+    <a href="#" class="nav-item" data-section="analisis">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+      </span>
+      <span class="nav-label">Análisis</span>
+    </a>
+    <a href="#" class="nav-item" data-section="ia">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2z"/>
+          <path d="M12 8v4l3 2"/>
+          <circle cx="12" cy="12" r="2" fill="currentColor"/>
+        </svg>
+      </span>
+      <span class="nav-label">Asistente IA</span>
+    </a>
+    <a href="#" class="nav-item" data-section="ajustes">
+      <span class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/>
+        </svg>
+      </span>
+      <span class="nav-label">Ajustes</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
+      <span class="theme-icon-dark">🌙</span>
+      <span class="theme-icon-light">☀️</span>
+      <span class="nav-label">Cambiar tema</span>
+    </button>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════════════════════════════════════════ -->
+<main class="main-content" id="mainContent">
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+    <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    <div class="topbar-actions">
+      <button class="btn-fab" id="btnNuevoMovimiento" title="Nuevo movimiento">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ─── SECCIONES ─────────────────────────────────────────────────────── -->
+  <div class="sections-wrapper">
+    <div id="section-dashboard"  class="section active"></div>
+    <div id="section-movimientos" class="section"></div>
+    <div id="section-historial"   class="section"></div>
+    <div id="section-analisis"    class="section"></div>
+    <div id="section-ia"          class="section"></div>
+    <div id="section-ajustes"     class="section"></div>
+  </div>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     MODAL MOVIMIENTO
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle">Nuevo Movimiento</h2>
+      <button class="modal-close" id="modalClose">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId" />
+
+      <!-- Tipo -->
+      <div class="tipo-selector">
+        <button class="tipo-btn active" data-tipo="gasto" id="btnTipoGasto">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+          Gasto
+        </button>
+        <button class="tipo-btn" data-tipo="ingreso" id="btnTipoIngreso">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          Ingreso
+        </button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Nombre / Descripción *</label>
+          <input type="text" id="fNombre" placeholder="ej. Supermercado Mercadona" />
+        </div>
+        <div class="form-group">
+          <label>Importe *</label>
+          <input type="number" id="fImporte" placeholder="0.00" step="0.01" min="0.01" />
+        </div>
+        <div class="form-group">
+          <label>Fecha *</label>
+          <input type="date" id="fFecha" />
+        </div>
+        <div class="form-group full">
+          <label>Categoría *</label>
+          <select id="fCategoria"></select>
+        </div>
+        <div class="form-group full">
+          <label>Notas (opcional)</label>
+          <textarea id="fNotas" placeholder="Añade información adicional..." rows="2"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="btnCancelar">Cancelar</button>
+      <button class="btn btn-primary" id="btnGuardar">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notifications -->
+<div id="toastContainer"></div>
+
+<!-- Scripts -->
+<script src="/static/js/api.js"></script>
+<script src="/static/js/charts.js"></script>
+<script src="/static/js/sections/dashboard.js"></script>
+<script src="/static/js/sections/movimientos.js"></script>
+<script src="/static/js/sections/historial.js"></script>
+<script src="/static/js/sections/analisis.js"></script>
+<script src="/static/js/sections/ia.js"></script>
+<script src="/static/js/sections/ajustes.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
