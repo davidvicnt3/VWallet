@@ -153,10 +153,16 @@ function setTipoModal(tipo) {
   _actualizarCategoriasModal(tipo);
 }
 
+// SÍNCRONA: usa _categorias que ya está cargado en init().
+// No hace fetch para evitar race conditions al cambiar tipo rápidamente.
 function _actualizarCategoriasModal(tipo) {
   const sel = document.getElementById('fCategoria');
-  const filtradas = _categorias.filter(c => c.tipo === tipo || c.tipo === 'ambos');
-  sel.innerHTML = filtradas.map(c => `<option value="${c.nombre}">${c.icono} ${c.nombre}</option>`).join('');
+  if (!sel) return;
+  // Filtrar por tipo exacto (las categorías vienen de la BD con tipo 'gasto' o 'ingreso')
+  const filtradas = _categorias.filter(c => c.tipo === tipo);
+  sel.innerHTML = filtradas.map(c =>
+    `<option value="${escapeHtml(c.nombre)}">${c.icono} ${c.nombre}</option>`
+  ).join('');
 }
 
 function abrirModal(movimiento = null) {

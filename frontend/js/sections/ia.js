@@ -1,6 +1,6 @@
 /**
  * ia.js - Sección Asistente IA
- * Chat con Grok para consejos financieros personalizados.
+ * Chat con Groq para consejos financieros personalizados.
  */
 
 const IA = {

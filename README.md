@@ -1,23 +1,23 @@
-# 💰 FinFlow — Gestor de Gastos Personal
+# ◈ VWallet — Gestor de Gastos Personales
 
 Aplicación web completa para gestionar tus finanzas personales, con dashboard interactivo, historial de movimientos, análisis económico y asistente de IA.
 
-## 🧱 Tecnologías
+## • Tecnologías
 
 | Capa | Tecnología |
 |------|-----------|
 | Backend | **Python 3.9+** con **FastAPI** |
-| Base de datos | **SQLite** (archivo local, sin configuración) |
-| Frontend | **HTML + CSS + JavaScript** puro |
+| Base de datos | **SQLite** |
+| Frontend | **HTML + CSS + JavaScript**  |
 | Gráficos | **Chart.js** |
-| IA | **Grok API** (xAI) |
+| IA | **Groq API** |
 
 ---
 
-## 🚀 Instalación y despliegue
+## • Instalación y despliegue
 
 ### Requisitos previos
-- **Python 3.9 o superior** → [python.org](https://www.python.org/downloads/)
+- **Python 3.9 o superior** (puede tener problemas con las últimas versiones. Versiones recomendadas: 3.9 - 3.12) → [python.org](https://www.python.org/downloads/)
 - Conexión a internet (solo para cargar fuentes y Chart.js)
 
 ### Opción A — Script automático (recomendado)
@@ -61,7 +61,7 @@ Abre tu navegador en: **http://localhost:8000**
 
 ---
 
-## 📁 Estructura del proyecto
+## • Estructura del proyecto
 
 ```
 gastos-app/
@@ -69,7 +69,7 @@ gastos-app/
 │   ├── main.py          # Servidor FastAPI + rutas API
 │   ├── database.py      # Acceso a datos SQLite
 │   ├── models.py        # Modelos Pydantic (validación)
-│   └── ai_service.py    # Integración con Grok API
+│   └── ai_service.py    # Integración con Groq API
 ├── frontend/
 │   ├── index.html       # Página principal (SPA)
 │   ├── css/
@@ -77,7 +77,7 @@ gastos-app/
 │   └── js/
 │       ├── api.js       # Cliente HTTP para el backend
 │       ├── app.js       # Lógica principal + utilidades
-│       ├── charts.js    # Helpers de Chart.js
+│       ├── charts.js    # Helpers de Chart.js (gráficos)
 │       └── sections/
 │           ├── dashboard.js
 │           ├── movimientos.js
@@ -95,9 +95,10 @@ gastos-app/
 
 ---
 
-## ✨ Funcionalidades
+## • Funcionalidades
 
 ### 📊 Dashboard
+- Presupuesto mensual
 - Saldo total, gastos e ingresos del mes con comparativa vs mes anterior
 - Gráfico de barras: tendencia de últimos 6 meses
 - Gráfico de dona: distribución de gastos por categoría
@@ -120,11 +121,12 @@ gastos-app/
 - Tasa de ahorro (ingresos vs gastos)
 - Día de la semana con mayor gasto
 - Evolución anual (12 meses)
+- Gasto vs Ingreso por Mes (año actual)
 - Top categorías con barras de progreso
 - Distribución histórica por categoría
 
 ### 🤖 Asistente IA
-- Chat con Grok (xAI) con contexto financiero personalizado
+- Chat con Groq con contexto financiero personalizado
 - La IA conoce tus gastos e ingresos para dar consejos relevantes
 - Historial de conversación en sesión
 - Sugerencias de preguntas frecuentes
@@ -139,9 +141,9 @@ gastos-app/
 
 ---
 
-## 🔑 Configurar la IA (Grok)
+## • Configurar la IA (Groq)
 
-1. Regístrate en [console.x.ai](https://console.x.ai)
+1. Regístrate gratis en [console.groq.com](https://console.groq.com/home)
 2. Crea una API Key gratuita
 3. En la app, ve a **Asistente IA** e introduce tu clave
 4. Haz clic en **Guardar** — la clave se almacena localmente
@@ -150,7 +152,7 @@ gastos-app/
 
 ---
 
-## 🎨 Temas
+## • Temas
 
 Cambia entre tema **oscuro** y **claro** desde:
 - El botón 🌙/☀️ en la parte inferior del sidebar
@@ -181,19 +183,3 @@ El backend expone una API REST completa en `http://localhost:8000`. Puedes explo
 | POST | `/api/ia/chat` | Chat con IA |
 
 ---
-
-## 🛠️ Modificar y extender
-
-El código está organizado para ser fácilmente modificable:
-
-- **Añadir una categoría:** edita `_insertar_categorias_default()` en `database.py`
-- **Cambiar colores/fuentes:** edita las variables CSS en `css/main.css`
-- **Añadir un campo al movimiento:** modifica `models.py`, `database.py` (tabla + queries) y el formulario en `index.html`/`movimientos.js`
-- **Cambiar el modelo de IA:** edita `GROK_MODEL` en `ai_service.py`
-- **Añadir una nueva sección:** crea `frontend/js/sections/nueva.js`, añade el nav-item en `index.html` y regístralo en `SECCIONES` en `app.js`
-
----
-
-## 📄 Licencia
-
-Proyecto personal de código abierto. Úsalo, modifícalo y distribúyelo libremente.

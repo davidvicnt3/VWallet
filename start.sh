@@ -1,9 +1,9 @@
 #!/bin/bash
-# FinFlow - Script de inicio (Linux/Mac)
+# VWallet - Script de inicio (Linux/Mac)
 
 echo ""
 echo "  ======================================"
-echo "   FinFlow - Gestor de Gastos Personal"
+echo "   VWallet - Gestor de Gastos Personal"
 echo "  ======================================"
 echo ""
 
@@ -30,7 +30,7 @@ echo "[INFO] Instalando dependencias..."
 pip install -r requirements.txt -q
 
 echo ""
-echo "[OK] Iniciando FinFlow en http://localhost:8000"
+echo "[OK] Iniciando VWallet en http://localhost:8000"
 echo "[INFO] Abre tu navegador en: http://localhost:8000"
 echo "[INFO] Presiona Ctrl+C para detener"
 echo ""

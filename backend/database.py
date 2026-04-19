@@ -240,14 +240,14 @@ class Database:
         with self._conectar() as conn:
             hoy = date.today()
 
-            # Gasto promedio diario (último mes)
+            # Gasto promedio diario (últimos 30 días)
+            # Usamos SUM/30 para que los días sin gasto cuenten como 0,
+            # evitando que el promedio se infle si solo hay pocos días con gasto.
             avg_diario = conn.execute("""
-                SELECT COALESCE(AVG(dia_total), 0) FROM (
-                    SELECT fecha, SUM(importe) AS dia_total
-                    FROM movimientos WHERE tipo='gasto'
-                    AND fecha >= date('now','-30 days')
-                    GROUP BY fecha
-                )
+                SELECT COALESCE(SUM(importe), 0) / 30.0
+                FROM movimientos
+                WHERE tipo='gasto'
+                AND fecha >= date('now','-30 days')
             """).fetchone()[0]
 
             # Top categorías de gasto (todo el tiempo)
@@ -320,7 +320,7 @@ class Database:
             return resultado
 
     def guardar_ajustes(self, ajustes: Ajustes):
-        datos = ajustes.dict(exclude_none=True)
+        datos = ajustes.model_dump(exclude_none=True)
         with self._conectar() as conn:
             for clave, valor in datos.items():
                 conn.execute(
