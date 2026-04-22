@@ -14,7 +14,7 @@ const IA = {
     // Cargar API key guardada
     try {
       const ajustes = await API.getAjustes();
-      this.apiKey = ajustes.grok_api_key || '';
+      this.apiKey = ajustes.groq_api_key || '';
     } catch (e) {
       this.apiKey = '';
     }
@@ -57,7 +57,7 @@ const IA = {
 
         <!-- Barra de entrada -->
         <div class="chat-input-bar">
-          <textarea id="iaInput" placeholder="${this.apiKey ? 'Escribe tu mensaje...' : 'Guarda tu API Key de Grok para chatear'}" rows="1"
+          <textarea id="iaInput" placeholder="${this.apiKey ? 'Escribe tu mensaje...' : 'Guarda tu API Key de Groq para chatear'}" rows="1"
             ${!this.apiKey ? 'disabled' : ''}></textarea>
           <button class="chat-send-btn" id="iaBtnEnviar" ${!this.apiKey ? 'disabled' : ''} title="Enviar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -75,7 +75,7 @@ const IA = {
       const key = document.getElementById('iaApiKey').value.trim();
       this.apiKey = key;
       try {
-        await API.guardarAjustes({ grok_api_key: key });
+        await API.guardarAjustes({ groq_api_key: key });
         showToast('API Key guardada correctamente', 'success');
         document.getElementById('iaInput').disabled = !key;
         document.getElementById('iaBtnEnviar').disabled = !key;
@@ -106,7 +106,7 @@ const IA = {
     const texto = btn.textContent.trim();
     const input = document.getElementById('iaInput');
     if (!input || input.disabled) {
-      showToast('Guarda tu API Key de Grok primero', 'info');
+      showToast('Guarda tu API Key de Groq primero', 'info');
       document.getElementById('iaApiKey')?.focus();
       return;
     }
@@ -120,7 +120,7 @@ const IA = {
     if (!mensaje || this.cargando) return;
 
     if (!this.apiKey) {
-      showToast('Introduce y guarda tu API Key de Grok', 'info');
+      showToast('Introduce y guarda tu API Key de Groq', 'info');
       return;
     }
 
@@ -157,7 +157,7 @@ const IA = {
     } catch (e) {
       document.getElementById(loadingId)?.remove();
       const msg = e.message.includes('inválida') || e.message.includes('401')
-        ? '❌ API Key inválida. Verifica tu clave de Grok.'
+        ? '❌ API Key inválida. Verifica tu clave de Groq.'
         : '❌ Error: ' + e.message;
       this._agregarMensaje('assistant', msg);
     } finally {
