@@ -1,5 +1,5 @@
 /**
- * app.js - Lógica principal de la aplicación FinFlow
+ * app.js - Lógica principal de la aplicación VWallet
  * Navegación, modal, utilidades globales y arranque.
  */
 
