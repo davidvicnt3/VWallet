@@ -9,7 +9,7 @@ async function renderMovimientos() {
   
   // Cargar categorías si no están cargadas
   if (_categorias.length === 0) {
-    try { _categorias = await API.getListaCategorias(); } catch (e) { _categorias = []; }
+    try { _categorias = await API.getListaCategorias(); } catch (e) { /* mantener _categorias como estaba */ }
   }
 
   el.innerHTML = `

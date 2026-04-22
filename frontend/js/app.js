@@ -1,19 +1,15 @@
 /**
- * app.js - Lógica principal de la aplicación VWallet
+ * app.js - Lógica principal de la aplicación FinFlow
  * Navegación, modal, utilidades globales y arranque.
  */
 
-// ═══════════════════════════════════════════════════════════════════════════
 // Estado global
-// ═══════════════════════════════════════════════════════════════════════════
 let _seccionActual = 'dashboard';
 let _categorias = [];
 let _editandoId = null;
 window._monedaSimbol = '€';
 
-// ═══════════════════════════════════════════════════════════════════════════
 // Navegación
-// ═══════════════════════════════════════════════════════════════════════════
 const SECCIONES = {
   dashboard:    { titulo: 'Dashboard',      render: renderDashboard },
   movimientos:  { titulo: 'Movimientos',    render: renderMovimientos },
@@ -51,26 +47,21 @@ async function irA(seccion) {
   document.getElementById('sidebar').classList.remove('mobile-open');
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
 // Sidebar
-// ═══════════════════════════════════════════════════════════════════════════
 function initSidebar() {
   const sidebar = document.getElementById('sidebar');
   const main    = document.getElementById('mainContent');
   const toggle  = document.getElementById('sidebarToggle');
   const mobileBtn = document.getElementById('mobileMenuBtn');
 
-  // Recuperar estado del sidebar
-  const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-  if (collapsed) {
-    sidebar.classList.add('collapsed');
-    main.classList.add('sidebar-collapsed');
-  }
+  // Sidebar siempre desplegado al iniciar
+  localStorage.removeItem('sidebarCollapsed');
 
   toggle.addEventListener('click', () => {
     const isCollapsed = sidebar.classList.toggle('collapsed');
     main.classList.toggle('sidebar-collapsed', isCollapsed);
     localStorage.setItem('sidebarCollapsed', isCollapsed);
+    // ResizeObserver se encarga del resize (ver initSidebar)
   });
 
   mobileBtn.addEventListener('click', () => {
@@ -93,11 +84,20 @@ function initSidebar() {
       irA(item.dataset.section);
     });
   });
+
+  // ResizeObserver: redimensiona gráficos cuando el contenedor cambia de ancho
+  // Cubre sidebar toggle, resize de ventana y cualquier otro cambio de layout
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(() => {
+      Object.values(Charts._instances).forEach(chart => {
+        if (chart && chart.canvas) chart.resize();
+      });
+    });
+    ro.observe(main);
+  }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
 // Tema claro/oscuro
-// ═══════════════════════════════════════════════════════════════════════════
 function setTema(tema) {
   document.documentElement.setAttribute('data-theme', tema);
   localStorage.setItem('tema', tema);
@@ -116,9 +116,7 @@ function initTema() {
   });
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
 // Modal de Movimiento (crear / editar)
-// ═══════════════════════════════════════════════════════════════════════════
 function initModal() {
   const overlay = document.getElementById('modalOverlay');
   const cerrar  = () => {
@@ -135,12 +133,12 @@ function initModal() {
     if (e.key === 'Escape' && overlay.classList.contains('open')) cerrar();
   });
 
-  // Tipo gasto/ingreso
-  document.getElementById('btnTipoGasto').addEventListener('click', () => {
-    setTipoModal('gasto');
-  });
-  document.getElementById('btnTipoIngreso').addEventListener('click', () => {
-    setTipoModal('ingreso');
+  // Tipo gasto/ingreso - usar delegación de eventos para evitar problemas con re-renders
+  // Solo reaccionar a los botones de tipo dentro del .tipo-selector del modal
+  document.querySelector('#modal .tipo-selector').addEventListener('click', (e) => {
+    const btn = e.target.closest('.tipo-btn');
+    if (!btn) return;
+    setTipoModal(btn.dataset.tipo);
   });
 
   // Guardar
@@ -153,19 +151,18 @@ function setTipoModal(tipo) {
   _actualizarCategoriasModal(tipo);
 }
 
-// SÍNCRONA: usa _categorias que ya está cargado en init().
-// No hace fetch para evitar race conditions al cambiar tipo rápidamente.
 function _actualizarCategoriasModal(tipo) {
   const sel = document.getElementById('fCategoria');
-  if (!sel) return;
-  // Filtrar por tipo exacto (las categorías vienen de la BD con tipo 'gasto' o 'ingreso')
-  const filtradas = _categorias.filter(c => c.tipo === tipo);
-  sel.innerHTML = filtradas.map(c =>
-    `<option value="${escapeHtml(c.nombre)}">${c.icono} ${c.nombre}</option>`
-  ).join('');
+  const filtradas = _categorias.filter(c => c.tipo === tipo || c.tipo === 'ambos');
+  sel.innerHTML = filtradas.map(c => `<option value="${c.nombre}">${c.icono} ${c.nombre}</option>`).join('');
 }
 
-function abrirModal(movimiento = null) {
+async function abrirModal(movimiento = null) {
+  // Garantizar que _categorias está cargado ANTES de abrir el modal
+  if (_categorias.length === 0) {
+    try { _categorias = await API.getListaCategorias(); } catch (e) {}
+  }
+
   const overlay = document.getElementById('modalOverlay');
   document.getElementById('modalTitle').textContent = movimiento ? 'Editar Movimiento' : 'Nuevo Movimiento';
 
@@ -236,9 +233,7 @@ document.getElementById('btnNuevoMovimiento').addEventListener('click', () => {
   abrirModal(null);
 });
 
-// ═══════════════════════════════════════════════════════════════════════════
 // Utilidades globales
-// ═══════════════════════════════════════════════════════════════════════════
 
 /** Formatea un número como moneda */
 function formatMoney(valor) {
@@ -250,35 +245,26 @@ function formatMoney(valor) {
   }).format(valor) + simbolo;
 }
 
-/** Devuelve la fecha de hoy en formato YYYY-MM-DD */
-function hoy() {
-  return new Date().toISOString().split('T')[0];
+function hoy() { return new Date().toISOString().split('T')[0]; } // fecha hoy en YYYY-MM-DD
+
+function formatFecha(s) {
+  // "2025-04-15" → "15 abr. 2025"
+  if (!s) return '—';
+  return new Date(s + 'T12:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-/** Formatea una fecha para mostrar */
-function formatFecha(fechaStr) {
-  if (!fechaStr) return '—';
-  const d = new Date(fechaStr + 'T12:00:00');
-  return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
-}
-
-/** Formatea un mes YYYY-MM como "Ene 2024" */
 function formatMes(mesStr) {
+  // "2025-04" → "Abr 25"
   if (!mesStr) return '';
-  const [año, mes] = mesStr.split('-');
-  const d = new Date(parseInt(año), parseInt(mes) - 1, 1);
-  return d.toLocaleDateString('es-ES', { month: 'short', year: '2-digit' });
+  const [y, m] = mesStr.split('-');
+  return new Date(+y, +m-1, 1).toLocaleDateString('es-ES', { month: 'short', year: '2-digit' });
 }
 
-/** Escapa HTML para evitar XSS */
 function escapeHtml(str) {
+  // Evita inyección de HTML convirtiendo caracteres especiales en entidades
   if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 /** Devuelve un emoji/icono para cada categoría */
@@ -296,39 +282,25 @@ function getCategoriaIcon(categoria) {
   return cat?.icono || iconos[categoria] || '💰';
 }
 
-/** Muestra una notificación toast */
 function showToast(mensaje, tipo = 'info') {
+  // Muestra una notificación flotante que desaparece sola a los 3.5s
   const iconos = { success: '✅', error: '❌', info: 'ℹ️' };
-  const container = document.getElementById('toastContainer');
-
-  const toast = document.createElement('div');
-  toast.className = `toast ${tipo}`;
-  toast.innerHTML = `<span class="toast-icon">${iconos[tipo]}</span><span>${escapeHtml(mensaje)}</span>`;
-
-  container.appendChild(toast);
+  const toast = Object.assign(document.createElement('div'), {
+    className: `toast ${tipo}`,
+    innerHTML: `<span class="toast-icon">${iconos[tipo]}</span><span>${escapeHtml(mensaje)}</span>`,
+  });
+  document.getElementById('toastContainer').appendChild(toast);
   setTimeout(() => {
-    toast.style.animation = 'none';
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateX(40px)';
-    toast.style.transition = 'all 0.3s ease';
+    Object.assign(toast.style, { opacity: '0', transform: 'translateX(40px)', transition: 'all 0.3s ease' });
     setTimeout(() => toast.remove(), 300);
   }, 3500);
 }
 
-/** Muestra mensaje de error en una sección */
 function errorMsg(msg) {
-  return `
-    <div class="empty-state">
-      <div class="empty-state-icon">⚠️</div>
-      <h3>Error de conexión</h3>
-      <p>${escapeHtml(msg)}</p>
-    </div>
-  `;
+  return `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>Error de conexión</h3><p>${escapeHtml(msg)}</p></div>`;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
 // Arranque
-// ═══════════════════════════════════════════════════════════════════════════
 async function init() {
   // Inicializar UI
   initTema();
@@ -355,5 +327,5 @@ async function init() {
   await irA('dashboard');
 }
 
-// Arrancar cuando el DOM esté listo
+// Arrancar la app cuando el HTML esté cargado
 document.addEventListener('DOMContentLoaded', init);

@@ -1,3 +1,4 @@
+
 /* ═══════════════════════════════════════════════════════════════════════════
    VWallet - Estilos Principales
    Diseño moderno con soporte tema oscuro/claro
@@ -348,6 +349,8 @@ select option { background: var(--bg-card); }
   border-radius: var(--radius-lg);
   padding: 22px;
   transition: border-color var(--transition), box-shadow var(--transition);
+  min-width: 0;        /* permite que el card se encoja en grid/flex */
+  overflow: hidden;    /* el canvas nunca se sale del card */
 }
 .card:hover { border-color: var(--border-2); }
 
@@ -441,6 +444,12 @@ select option { background: var(--bg-card); }
 .chart-container {
   position: relative;
   height: 260px;
+  width: 100%;
+  min-width: 0;
+}
+
+.chart-container canvas {
+  max-width: 100% !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1061,3 +1070,4 @@ tbody td {
   background: var(--bg-3);
   color: var(--text-2);
 }
+

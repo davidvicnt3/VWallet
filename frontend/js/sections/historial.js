@@ -36,7 +36,7 @@ const Historial = {
         </div>
         <div class="filter-group">
           <label>Categoría</label>
-          <select id="fCategoria">
+          <select id="hCategoria">
             <option value="">Todas</option>
             ${cats.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('')}
           </select>
@@ -70,7 +70,7 @@ const Historial = {
       this.filtros = {
         buscar: document.getElementById('fBuscar').value.trim() || undefined,
         tipo: document.getElementById('fTipo').value || undefined,
-        categoria: document.getElementById('fCategoria').value || undefined,
+        categoria: document.getElementById('hCategoria').value || undefined,
         fecha_inicio: document.getElementById('fDesde').value || undefined,
         fecha_fin: document.getElementById('fHasta').value || undefined,
       };
@@ -83,7 +83,7 @@ const Historial = {
 
     document.getElementById('fBtnLimpiar').addEventListener('click', () => {
       ['fBuscar','fDesde','fHasta'].forEach(id => document.getElementById(id).value = '');
-      ['fTipo','fCategoria'].forEach(id => document.getElementById(id).value = '');
+      ['fTipo','hCategoria'].forEach(id => document.getElementById(id).value = '');
       this.filtros = {};
       this.pagina = 1;
       this._cargar();
